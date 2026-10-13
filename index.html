@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080d17">
+  <meta name="description" content="Compra Tu Juego: regalá experiencias gamer en segundos.">
+  <title>Compra Tu Juego — Regalá experiencias</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="announcement"><span class="pulse"></span> REGALOS DIGITALES · TU PRÓXIMA AVENTURA EMPIEZA ACÁ</div>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Compra Tu Juego inicio"><span class="brand-mark">⌘</span><span>Compra Tu <b>Juego</b></span></a>
+    <nav class="main-nav"><a class="active" href="#catalogo">Catálogo</a><a href="#como-funciona">Cómo funciona</a><a href="#beneficios">Beneficios</a></nav>
+    <div class="top-actions"><button class="icon-button" id="historyBtn" aria-label="Ver compras" title="Mis compras">▤<span class="cart-count" id="cartCount">0</span></button><button class="account-btn" id="accountBtn"><span class="avatar">T</span><span>Mi cuenta</span></button><button class="mobile-menu" id="mobileMenu" aria-label="Abrir menú">☰</button></div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-bg"></div><div class="hero-content">
+        <div class="eyebrow"><span class="eyebrow-line"></span> EL REGALO PERFECTO EXISTE</div>
+        <h1>Regalá una partida.<br><span>Creá un recuerdo.</span></h1>
+        <p>Los juegos que aman, para las personas que querés.<br>Elegí, personalizá y regalá en minutos.</p>
+        <a class="primary-btn" href="#catalogo">Explorar catálogo <span>↗</span></a>
+        <div class="hero-proof"><div class="proof-avatars"><i>✦</i><i>◈</i><i>✧</i></div><span><strong>Un detalle que se juega.</strong><br>Una sorpresa que se recuerda.</span></div>
+      </div>
+      <div class="hero-feature"><div class="feature-label"><span class="live-dot"></span> DESTACADO</div><div class="feature-title">EL PRÓXIMO<br><span>GRAN REGALO</span></div><p>Una nueva aventura te espera.</p><a href="#catalogo">Descubrí los favoritos <span>→</span></a></div>
+      <div class="hero-deco deco-one">✳</div><div class="hero-deco deco-two">✦</div>
+    </section>
+
+    <section class="catalog section-wrap" id="catalogo">
+      <div class="section-heading"><div><div class="eyebrow">ELEGÍ TU PRÓXIMA SORPRESA</div><h2>El catálogo <span>gamer</span></h2><p>Un mundo de posibilidades a un regalo de distancia.</p></div><div class="catalog-count"><b id="resultCount">8</b> juegos para descubrir</div></div>
+      <div class="toolbar"><div class="searchbox"><span>⌕</span><input id="searchInput" type="search" placeholder="Buscá un juego..." aria-label="Buscar juegos"></div><div class="filters" id="filters"><button class="filter active" data-filter="Todos">Todos</button><button class="filter" data-filter="Acción">Acción</button><button class="filter" data-filter="Deportes">Deportes</button><button class="filter" data-filter="Aventura">Aventura</button><button class="filter" data-filter="Simulación">Simulación</button></div><select id="sortSelect" aria-label="Ordenar juegos"><option value="featured">Destacados</option><option value="low">Menor precio</option><option value="high">Mayor precio</option><option value="az">Nombre A-Z</option></select></div>
+      <div class="game-grid" id="gameGrid" aria-live="polite"></div>
+    </section>
+
+    <section class="steps-section" id="como-funciona"><div class="section-wrap"><div class="section-heading centered"><div class="eyebrow">ASÍ DE FÁCIL</div><h2>Regalar nunca fue <span>tan simple</span></h2><p>Tres pasos. Una sorpresa inolvidable.</p></div><div class="steps-grid"><article class="step-card"><div class="step-icon">▦</div><span class="step-number">01 / ELEGÍ</span><h3>Encontrá su próximo favorito</h3><p>Explorá el catálogo y elegí ese juego que tiene en su wishlist.</p></article><article class="step-card"><div class="step-icon">＠</div><span class="step-number">02 / PERSONALIZÁ</span><h3>Decinos para quién es</h3><p>Ingresá su tag y prepará el regalo para la persona correcta.</p></article><article class="step-card"><div class="step-icon">✧</div><span class="step-number">03 / SORPRENDÉ</span><h3>Confirmá y listo</h3><p>Revisá los detalles y disfrutá de la magia de regalar.</p></article></div></div></section>
+    <section class="benefits section-wrap" id="beneficios"><div class="benefit"><span>◇</span><div><b>Regalo personalizado</b><p>El detalle es todo.</p></div></div><div class="benefit"><span>⌁</span><div><b>Checkout simple</b><p>Sin vueltas ni sorpresas.</p></div></div><div class="benefit"><span>♡</span><div><b>Momentos compartidos</b><p>Los mejores regalos se disfrutan.</p></div></div></section>
+  </main>
+  <footer><a class="brand footer-brand" href="#"><span class="brand-mark">⌘</span><span>Compra Tu <b>Juego</b></span></a><p>Hecho para compartir más partidas. <span>© 2026 Compra Tu Juego · Demo interactiva</span></p><span class="footer-note">No procesa pagos reales</span></footer>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="closeModal" aria-label="Cerrar">×</button>
+      <div class="modal-progress"><span class="progress-step active" data-stepdot="1">1</span><i></i><span class="progress-step" data-stepdot="2">2</span><i></i><span class="progress-step" data-stepdot="3">3</span></div>
+      <div id="modalContent"></div>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>

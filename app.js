@@ -1,0 +1,56 @@
+const games = [
+ {id:'gta6',name:'Grand Theft Auto VI',short:'GTA VI',publisher:'Rockstar Games',category:'Acción',price:89999,art1:'#7035a0',art2:'#ed8b8e',symbol:'✦',word:'GRAND THEFT<br>AUTO VI',tag:'MUY ESPERADO',featured:true},
+ {id:'fc27',name:'EA FC 27 Ultimate',short:'EA FC 27 ULTIMATE',publisher:'EA Sports',category:'Deportes',price:79999,art1:'#164b4e',art2:'#b7a078',symbol:'⚽',word:'FC 27<small>ULTIMATE EDITION</small>',tag:'ULTIMATE',featured:true},
+ {id:'minecraft',name:'Minecraft',short:'Minecraft',publisher:'Mojang Studios',category:'Aventura',price:26999,art1:'#1f6c4e',art2:'#89b954',symbol:'▧',word:'MINECRAFT',tag:'CLÁSICO',featured:true},
+ {id:'cod7',name:'Call of Duty: Black Ops 7',short:'Black Ops 7',publisher:'Activision',category:'Acción',price:79999,art1:'#1b3039',art2:'#967c5a',symbol:'◈',word:'BLACK OPS 7',tag:'ACCIÓN',featured:true},
+ {id:'sims4',name:'The Sims 4',short:'The Sims 4',publisher:'Electronic Arts',category:'Simulación',price:49999,art1:'#177c88',art2:'#d7a2b9',symbol:'✿',word:'The Sims 4',tag:'SIMULACIÓN',featured:true},
+ {id:'valorant',name:'VALORANT Points',short:'VALORANT Points',publisher:'Riot Games',category:'Acción',price:29999,art1:'#8d2346',art2:'#252a4b',symbol:'✕',word:'VALORANT',tag:'DIGITAL'},
+ {id:'rdr2',name:'Red Dead Redemption II',short:'Red Dead Redemption II',publisher:'Rockstar Games',category:'Aventura',price:59999,art1:'#8f291d',art2:'#d5a34f',symbol:'✧',word:'RED DEAD<br>REDEMPTION II',tag:'AVENTURA'},
+ {id:'hogwarts',name:'Hogwarts Legacy',short:'Hogwarts Legacy',publisher:'Warner Bros. Games',category:'Aventura',price:54999,art1:'#182b4d',art2:'#b28a53',symbol:'✦',word:'HOGWARTS<br>LEGACY',tag:'FANTASÍA'}
+];
+const money = n => new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n);
+const $ = s => document.querySelector(s);
+let activeFilter='Todos', selectedGame=null, recipient='', step=1, purchases=JSON.parse(localStorage.getItem('ctj-demo-purchases')||'[]'), toastTimer;
+const grid=$('#gameGrid'), backdrop=$('#modalBackdrop'), modalContent=$('#modalContent');
+
+function artMarkup(g, mini=false){return `<div class="${mini?'mini-art':'game-art'}" style="--art1:${g.art1};--art2:${g.art2}">${mini?g.symbol:`<div class="art-shape"></div><span class="tag">${g.tag}</span><div class="art-symbol">${g.symbol}</div><div class="art-word">${g.word}</div>`}</div>`}
+function renderGames(){
+ const q=$('#searchInput').value.trim().toLowerCase();
+ let list=games.filter(g=>(activeFilter==='Todos'||g.category===activeFilter)&&`${g.name} ${g.publisher} ${g.category}`.toLowerCase().includes(q));
+ const sort=$('#sortSelect').value;
+ if(sort==='low')list.sort((a,b)=>a.price-b.price); if(sort==='high')list.sort((a,b)=>b.price-a.price);if(sort==='az')list.sort((a,b)=>a.name.localeCompare(b.name));
+ $('#resultCount').textContent=list.length;
+ grid.innerHTML=list.length?list.map(g=>`<article class="game-card">${artMarkup(g)}<div class="game-info"><div class="game-category">${g.category}</div><h3 title="${g.name}">${g.name}</h3><p class="publisher">${g.publisher}</p><div class="game-bottom"><span class="price">${money(g.price)}</span><button class="gift-btn" data-gift="${g.id}"><span>✧</span> Regalar</button></div></div></article>`).join(''):`<div class="empty-state">No encontramos juegos con esa búsqueda.<br>Probá con otro nombre o categoría.</div>`;
+ grid.querySelectorAll('[data-gift]').forEach(btn=>btn.addEventListener('click',()=>openCheckout(games.find(g=>g.id===btn.dataset.gift))));
+}
+function updateProgress(){document.querySelectorAll('[data-stepdot]').forEach(el=>{const n=+el.dataset.stepdot;el.classList.toggle('active',n===step);el.classList.toggle('done',n<step);el.textContent=n<step?'✓':n;});}
+function openCheckout(game){selectedGame=game;recipient='';step=1;backdrop.hidden=false;document.body.style.overflow='hidden';renderStep();setTimeout(()=>$('#recipientInput')?.focus(),80)}
+function closeModal(){backdrop.hidden=true;document.body.style.overflow='';}
+function selectedSummary(){return `<div class="selected-game">${artMarkup(selectedGame,true)}<div><h3>${selectedGame.name}</h3><p>${selectedGame.publisher}</p><strong>${money(selectedGame.price)}</strong></div></div>`}
+function renderStep(){
+ updateProgress();
+ if(step===1){
+ modalContent.innerHTML=`<div class="modal-kicker">UN REGALO PARA RECORDAR</div><h2 id="modalTitle">¿A quién se lo regalás?</h2><p class="modal-subtitle">Ingresá el tag o nombre de usuario de la persona que va a recibir esta sorpresa.</p>${selectedSummary()}<label class="field-label" for="recipientInput">Tag o usuario del destinatario</label><input class="text-field" id="recipientInput" maxlength="40" autocomplete="off" placeholder="Ej. jugador123 o @amigo" value="${escapeHTML(recipient)}"><p class="field-hint">Revisá que el usuario esté bien escrito. En una tienda real, la plataforma debe ser compatible con el juego elegido.</p><button class="modal-primary" id="continueRecipient">Continuar <span>→</span></button>`;
+ $('#continueRecipient').onclick=()=>{const value=$('#recipientInput').value.trim();if(value.length<2){showToast('Ingresá un tag válido para continuar.');$('#recipientInput').focus();return}recipient=value;step=2;renderStep()};
+ $('#recipientInput').addEventListener('keydown',e=>{if(e.key==='Enter')$('#continueRecipient').click()});
+ }else if(step===2){
+ modalContent.innerHTML=`<div class="modal-kicker">PASO 02 · PAGO</div><h2 id="modalTitle">Método de pago</h2><p class="modal-subtitle">Elegí cómo querés abonar tu regalo. Ya tenés un método predeterminado.</p>${selectedSummary()}<div class="payment-option"><div class="visa-logo">VISA</div><div class="payment-detail"><b>Visa · Crédito</b><small>•••• •••• •••• 5821</small><br><span class="default-pill">✓ PREDETERMINADA</span></div><span class="payment-check">●</span></div><div class="security-note"><span>♢</span><span>Tarjeta de demostración. No se ingresan ni almacenan datos financieros reales y no se realizará ningún cobro.</span></div><button class="modal-primary" id="reviewOrder">Revisar compra <span>→</span></button><button class="modal-secondary" id="backRecipient">← Volver al destinatario</button>`;
+ $('#reviewOrder').onclick=()=>{step=3;renderStep()};$('#backRecipient').onclick=()=>{step=1;renderStep()};
+ }else if(step===3){
+ modalContent.innerHTML=`<div class="modal-kicker">PASO 03 · ÚLTIMO PASO</div><h2 id="modalTitle">Revisá tu compra</h2><p class="modal-subtitle">Chequeá que todo esté perfecto antes de confirmar esta demo.</p>${selectedSummary()}<div class="review-row"><span>Se lo regalás a</span><strong>@${escapeHTML(recipient.replace(/^@/,''))}</strong></div><div class="review-row"><span>Método de pago</span><strong>Visa · •••• 5821</strong></div><div class="review-row"><span>Tipo de entrega</span><strong>Regalo digital (demo)</strong></div><div class="review-row total"><span>Total</span><strong>${money(selectedGame.price)}</strong></div><div class="demo-warning">ⓘ DEMO: confirmar mostrará el estado de compra simulada. No se procesará un pago ni se enviará una licencia real.</div><button class="modal-primary" id="confirmPurchase">Confirmar compra <span>→</span></button><button class="modal-secondary" id="backPayment">← Volver al pago</button>`;
+ $('#confirmPurchase').onclick=completePurchase;$('#backPayment').onclick=()=>{step=2;renderStep()};
+ }else renderSuccess();
+}
+function completePurchase(){const order={id:'CTJ-'+Date.now().toString().slice(-7),gameId:selectedGame.id,game:selectedGame.name,price:selectedGame.price,recipient:recipient.replace(/^@/,''),date:new Date().toISOString()};purchases.unshift(order);purchases=purchases.slice(0,30);localStorage.setItem('ctj-demo-purchases',JSON.stringify(purchases));$('#cartCount').textContent=purchases.length;step=4;updateProgress();renderSuccess()}
+function renderSuccess(){modalContent.innerHTML=`<div class="success-view"><div class="success-icon">✓</div><div class="modal-kicker">TODO LISTO · DEMO</div><h2 id="modalTitle">¡Compra realizada!</h2><p>El regalo fue enviado.<br><span style="color:#6ee4b4">En esta demo, la operación es simulada.</span></p><div class="success-ticket">${artMarkup(selectedGame,true)}<div><b>${selectedGame.name}</b><small>Regalo para @${escapeHTML(recipient.replace(/^@/,''))}</small><small>Orden ${purchases[0]?.id||'CTJ-DEMO'}</small></div></div><div class="success-status">Confirmación de demo completada</div><button class="modal-primary" id="backCatalog" style="margin-top:23px">Volver al catálogo <span>↗</span></button><button class="modal-secondary" id="viewHistory">Ver mis compras</button></div>`;$('#backCatalog').onclick=()=>{closeModal();document.querySelector('#catalogo').scrollIntoView({behavior:'smooth'})};$('#viewHistory').onclick=showHistory}
+function showHistory(){step=4;updateProgress();modalContent.innerHTML=`<div class="modal-kicker">TU ACTIVIDAD</div><h2 id="modalTitle">Mis compras</h2><p class="modal-subtitle">Historial local de regalos de demostración en este navegador.</p>${purchases.length?purchases.map(p=>{const g=games.find(x=>x.id===p.gameId)||games[0];return `<div class="history-item">${artMarkup(g,true)}<div><b>${escapeHTML(p.game)}</b><small>Para @${escapeHTML(p.recipient)} · Demo</small></div><strong>${money(p.price)}</strong></div>`}).join(''):`<div class="history-empty">Todavía no hay compras de demo.<br>Elegí un juego del catálogo para empezar.</div>`}<button class="modal-primary" id="historyDone" style="margin-top:20px">Volver <span>→</span></button>`;$('#historyDone').onclick=closeModal}
+function escapeHTML(str){return String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function showToast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2600)}
+$('#filters').addEventListener('click',e=>{const btn=e.target.closest('[data-filter]');if(!btn)return;activeFilter=btn.dataset.filter;document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b===btn));renderGames()});
+$('#searchInput').addEventListener('input',renderGames);$('#sortSelect').addEventListener('change',renderGames);
+$('#closeModal').addEventListener('click',closeModal);backdrop.addEventListener('click',e=>{if(e.target===backdrop)closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!backdrop.hidden)closeModal()});
+$('#historyBtn').addEventListener('click',()=>{backdrop.hidden=false;document.body.style.overflow='hidden';showHistory()});
+$('#accountBtn').addEventListener('click',()=>showToast('La cuenta estará disponible en la versión completa.'));
+$('#mobileMenu').addEventListener('click',()=>{const nav=document.querySelector('.main-nav');const opened=nav.style.display==='flex';nav.style.display=opened?'none':'flex';if(!opened){nav.style.position='absolute';nav.style.top='62px';nav.style.left='0';nav.style.right='0';nav.style.height='auto';nav.style.padding='18px';nav.style.background='#0b1423';nav.style.borderBottom='1px solid #24364e';nav.style.flexDirection='column';nav.style.alignItems='flex-start';nav.style.gap='20px';nav.querySelectorAll('a').forEach(a=>a.style.height='auto')}});
+$('#cartCount').textContent=purchases.length;
+renderGames();
